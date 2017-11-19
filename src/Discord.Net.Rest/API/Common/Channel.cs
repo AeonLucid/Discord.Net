@@ -13,6 +13,8 @@ namespace Discord.API
         public ChannelType Type { get; set; }
         [JsonProperty("last_message_id")]
         public ulong? LastMessageId { get; set; }
+        [JsonProperty("parent_id")]
+        public ulong? ParentId { get; set; }
 
         //GuildChannel
         [JsonProperty("guild_id")]

@@ -133,21 +133,41 @@ namespace Discord.Rest
             var models = await client.ApiClient.GetGuildChannelsAsync(guild.Id, options).ConfigureAwait(false);
             return models.Select(x => RestGuildChannel.Create(client, guild, x)).ToImmutableArray();
         }
-        public static async Task<RestTextChannel> CreateTextChannelAsync(IGuild guild, BaseDiscordClient client,
+        public static async Task<RestCategoryChannel> CreateCategoryChannelAsync(IGuild guild, BaseDiscordClient client, 
             string name, RequestOptions options)
+        {
+            if (name == null) throw new ArgumentNullException(nameof(name));
+            
+            var args = new CreateGuildChannelParams(name, ChannelType.Category);
+            var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
+
+            return RestCategoryChannel.Create(client, guild, model);
+        }
+        public static async Task<RestTextChannel> CreateTextChannelAsync(IGuild guild, BaseDiscordClient client, string name, RequestOptions options, ulong parentId = 0)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
 
             var args = new CreateGuildChannelParams(name, ChannelType.Text);
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
+
+            if (parentId > 0)
+            {
+                args.ParentId = $"{parentId}";
+            }
+            
             return RestTextChannel.Create(client, guild, model);
         }
-        public static async Task<RestVoiceChannel> CreateVoiceChannelAsync(IGuild guild, BaseDiscordClient client,
-            string name, RequestOptions options)
+        public static async Task<RestVoiceChannel> CreateVoiceChannelAsync(IGuild guild, BaseDiscordClient client, string name, RequestOptions options, ulong parentId = 0)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
 
             var args = new CreateGuildChannelParams(name, ChannelType.Voice);
+
+            if (parentId > 0)
+            {
+                args.ParentId = $"{parentId}";
+            }
+            
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
             return RestVoiceChannel.Create(client, guild, model);
         }
